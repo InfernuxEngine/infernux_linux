@@ -1,43 +1,25 @@
 # Infernux Linux 平台插件
 
-这是 [Infernux](https://github.com/ChenlizheMe/Infernux) 游戏引擎的官方 Linux 构建插件。它为编辑器提供 Linux x64 导出能力，并随包提供已经为对应引擎版本编译好的 Player 和 Python 运行时。
+[English](README.md) · [引擎版本制品](https://github.com/ChenlizheMe/Infernux/releases)
 
-[English](README.md) · [Infernux 引擎](https://github.com/ChenlizheMe/Infernux) · [插件模板](https://github.com/InfernuxEngine/infernux_plugin_template) · [发布制品](https://github.com/InfernuxEngine/infernux_linux/releases)
+为 Infernux 提供 `linux-x64` 构建目标。构建宿主与目标：Linux x64。
 
-![Infernux Linux 导出流程](package/plugin_pages/media/overview.png)
+![Infernux Linux 构建流程](package/plugin_pages/media/overview.png)
 
-## 插件提供什么
+## 安装与使用
 
-- 编辑器中的 `linux-x64` 构建目标
-- 预编译的原生 Player、CPython 3.13 运行时和并行模块
-- Vulkan 渲染与 Linux 导出流程
-- 不暴露可编辑项目目录的二进制内容包
+通过引擎的官方插件目录安装。平台插件随引擎版本统一构建，必须匹配引擎热修号、Python ABI 和目标平台。例如引擎 `0.4.3-v8` 对应平台安装包 `0.4.3.post8`；本仓库的源码包元数据会在最终打包时替换为自动生成的版本标识。
 
-| 包标识 | 版本 | 适配引擎 | 构建环境 | 目标平台 |
-| --- | --- | --- | --- | --- |
-| `infernux/platform-linux` | 0.2.20 | Infernux >=0.4.3; payload 0.4.3-v8; Python 3.13 | Linux x64 | Linux x64 |
+下载服务按 `platform-plugins/<engine_release>/` 保存制品，GitHub 备用下载来自同一个引擎 Release。四个平台子仓库不再各自独立发布二进制。
 
-## 安装与导出
+版本匹配时直接使用预编译 Player。已安装插件的载荷不匹配时，引擎构建器尝试从当前引擎版本的源码重新编译，验证后覆盖该插件的 Player 载荷，后续直接复用。重建需要相应工具链，不会替换引擎 SDK。
 
-在 Infernux 中打开**插件**窗口，从官方列表选择 **Infernux Linux Platform**，导入并启用即可。官方安装优先使用 Infernux 分发服务，网络不可用时回退到 GitHub Releases；也可以从本仓库下载 `infernux.platform-linux.inxpkg` 手动导入。
+## 维护
 
-在构建设置中选择 `linux-x64` 后导出。发布时需要保留完整输出目录以及 Player 的可执行权限。目标机器还需要可用的 Vulkan 驱动和 Player 报告的系统库。普通用户不需要引擎源码、CMake 或编译工具链。
+在引擎仓库使用 `scripts/release/build_platform_plugins.py` 构建或打包此平台。引擎 CI 使用同一源码提交生成四个平台插件，统一核对版本与摘要，全部成功后才能发布引擎。平台仓库自身的 CI 负责源码与打包检查。`package.py`、`release.py` 保留为独立开发检查工具。
 
-该插件在 Linux 上构建 Linux，不提供从 Windows 交叉构建 Linux 的能力。
-
-## 仓库说明
-
-只有 `package/` 会进入插件包；仓库文档、构建脚本、测试和 CI 都留在包外。
-
-```text
-package/
-  inx_package.json
-  editor/infernux_linux/
-  plugin_pages/
-```
-
-维护者使用引擎的 `linux-clang-player` preset，把 Player 直接产出到本仓库。推送与版本一致的 `v<version>` 标签后，GitHub Actions 会自动发布插件及 release manifest。
+安装包只包含 `package/` 和编译后的平台载荷。测试、CMake、CI、构建工具和缓存不会进入安装包。具体环境变量与批处理命令见引擎的[平台 Player 发布说明](https://github.com/ChenlizheMe/Infernux/blob/main/docs/learn/platform-player-releases.md)。
 
 ## 许可证
 
-[MIT](LICENSE)。随包提供的第三方组件继续遵守各自的许可证。
+[MIT](LICENSE)。捆绑依赖保留各自的许可证。

@@ -1,43 +1,25 @@
 # Infernux Linux Platform
 
-The official Linux build plugin for [Infernux](https://github.com/ChenlizheMe/Infernux), an open-source game engine with a C++17/Vulkan core and Python authoring layer. It turns an Infernux project into a native Linux x64 game using a Player already compiled for the engine release.
+[简体中文](README.zh-CN.md) · [Engine releases](https://github.com/ChenlizheMe/Infernux/releases)
 
-[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Template](https://github.com/InfernuxEngine/infernux_plugin_template) · [Releases](https://github.com/InfernuxEngine/infernux_linux/releases)
+The official `linux-x64` Player exporter for Infernux. Build hosts and targets: Linux x64.
 
 ![Infernux Linux export workflow](package/plugin_pages/media/overview.png)
 
-## What this plugin provides
+## Install
 
-- The `linux-x64` build target in the Infernux Editor
-- A precompiled native Player, CPython 3.13 runtime, and parallel module
-- Vulkan rendering and the Linux export pipeline
-- Binary game-content packaging instead of an editable project tree
+Install this platform from the engine's official plugin catalog. Platform packages are built and published with the engine release, using its exact hotfix, Python ABI and target. For example, engine `0.4.3-v8` owns platform package version `0.4.3.post8`. The source metadata in this repository is replaced by that generated identity during final packaging.
 
-| Package | Version | Compatible engine | Build host | Target |
-| --- | --- | --- | --- | --- |
-| `infernux/platform-linux` | 0.2.20 | Infernux >=0.4.3; payload 0.4.3-v8; Python 3.13 | Linux x64 | Linux x64 |
+The distribution service stores each engine's platform packages under `platform-plugins/<engine_release>/`. The corresponding engine GitHub Release provides the same packages as a download alternative. The plugin repositories no longer independently publish platform binaries.
 
-## Install and use
+A matching precompiled Player is used directly. If an installed Player is incompatible, the engine export worker attempts a source rebuild for the current engine release, validates it, and replaces the installed plugin's Player payload. This repair requires the corresponding source toolchain. Successful repairs are reused; the engine SDK is not replaced.
 
-Open **Plugins** in Infernux, select **Infernux Linux Platform** from the official catalog, then import and enable it. Official installs use the Infernux distribution service first and GitHub Releases if that channel is unavailable. Manual installation is available through `infernux.platform-linux.inxpkg` on the Releases page.
+## Maintain
 
-Choose `linux-x64` in the build settings and export. Ship the executable, runtime libraries, and packaged game data as one directory, preserving executable permissions. A Vulkan-capable driver and the system libraries reported by the Player are required at runtime. Users do not compile the engine or run CMake.
+From the engine repository, use `scripts/release/build_platform_plugins.py` to build or package this target. The engine's `engine-platform-plugins.yml` workflow collects all four platforms from the same engine commit, checks their identities and digests, and gates publication of the engine release. `package.py` and `release.py` remain available for standalone development checks, not independent platform distribution.
 
-Linux builds Linux; this package does not cross-compile a Linux Player from Windows.
-
-## Repository guide
-
-Only `package/` becomes the installable plugin. Repository documentation, build scripts, tests, and CI stay outside the `.inxpkg`.
-
-```text
-package/
-  inx_package.json
-  editor/infernux_linux/
-  plugin_pages/
-```
-
-Maintainers build the engine's `linux-clang-player` preset, which publishes the Player directly into this repository. Pushing a matching `v<version>` tag makes GitHub Actions build and publish the plugin and release manifest.
+Only `package/` and the compiled target payload enter the installable archive. Tests, CMake, CI, source build tools and caches remain outside it. See the engine documentation [Platform Player releases](https://github.com/ChenlizheMe/Infernux/blob/main/docs/learn/platform-player-releases.md) for toolchain variables and batch commands.
 
 ## License
 
-[MIT](LICENSE). Bundled third-party components retain their own licenses.
+[MIT](LICENSE). Bundled dependencies retain their own licenses.
