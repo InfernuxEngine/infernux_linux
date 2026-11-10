@@ -15,12 +15,11 @@ def _package_metadata(root: Path) -> dict[str, object]:
 
 
 def _runtime_engine_version(metadata: dict[str, object]) -> str:
-    """Read the engine version used for this package's initial Player payload."""
+    """Read the engine version required by this package's Player payload."""
     contract = metadata.get("engine")
-    if not isinstance(contract, str) or re.fullmatch(r">=\d+\.\d+\.\d+", contract) is None:
-        raise ValueError("Platform packages require a minimum engine version contract")
-    version = contract[2:].strip()
-    return version
+    if not isinstance(contract, str) or re.fullmatch(r"==\d+\.\d+\.\d+", contract) is None:
+        raise ValueError("Platform packages require an exact engine version contract")
+    return contract[2:]
 
 
 def player_payload(metadata: dict[str, object] | None = None) -> tuple[Path, tuple[str, ...]]:

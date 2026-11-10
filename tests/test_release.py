@@ -22,8 +22,8 @@ class ReleaseTests(unittest.TestCase):
         self.metadata = json.loads((self.root / "package/inx_package.json").read_text(encoding="utf-8"))
         self.tag = f"v{self.metadata['version']}"
         (self.payload / "Player.inxmanifest").write_text(json.dumps({
-            "engine_version": release._runtime_engine_version(self.metadata), "python_abi": "cp313",
-            "engine_release": release._runtime_engine_version(self.metadata) + "-v7",
+            "engine_version": self.metadata["engine"].removeprefix("=="), "python_abi": "cp313",
+            "engine_release": self.metadata["engine"].removeprefix("==") + "-v7",
             "platform": "linux", "machine": "x86_64", "distribution": "platform-plugin",
         }), encoding="utf-8")
         for name in ("Runtime.inxrt", "Parallel.inxmod"):
@@ -48,12 +48,12 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "engine/ABI"):
             release.build_release(self.tag)
 
-    def test_release_rejects_invalid_minimum_engine_contract(self):
+    def test_release_rejects_invalid_engine_contract(self):
         manifest = self.root / "package/inx_package.json"
         document = json.loads(manifest.read_text(encoding="utf-8"))
         document["engine"] = "0.4.2"
         manifest.write_text(json.dumps(document), encoding="utf-8")
-        with self.assertRaisesRegex(ValueError, "minimum engine version"):
+        with self.assertRaisesRegex(ValueError, "exact engine version"):
             release.build_release(self.tag)
 
     def test_cmake_entry_produces_only_the_final_inxpackage_and_manifest(self):
